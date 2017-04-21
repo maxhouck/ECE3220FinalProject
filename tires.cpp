@@ -16,10 +16,10 @@ using namespace std;
 
 
 Tire::Tire(void) {
-	//todo: finish this
+	//Should not need anything here.
 }
 
-Tire::Tire(location tireLoc, char* fileLoc) { //opens file, inputs data into temp vectors, closes file
+Tire::Tire(location tireLoc, const char* fileLoc) { //opens file, inputs data into temp vectors, closes file
 	//file format: outer,middle,inner
 	string line;
 	char *token;
@@ -43,14 +43,15 @@ Tire::Tire(location tireLoc, char* fileLoc) { //opens file, inputs data into tem
 }
 
 Tire::~Tire() { //default destructor
-	//todo
+	//Shouldnt need anything here. Vectors will delete themselves.
 }
 
 void Tire::addTemp(int temperature, char tempLocation) {
+	
 	switch(tempLocation) {
-		case 'o': tempOuterArray.push_back(temperature); break;
-		case 'm': tempMiddleArray.push_back(temperature); break;
-		case 'i': tempInnerArray.push_back(temperature); break;
+		case 'o': this->tempOuterArray.push_back(temperature); break;
+		case 'm': this->tempMiddleArray.push_back(temperature); break;
+		case 'i': this->tempInnerArray.push_back(temperature); break;
 		default: cout << "Error in addTemp" << endl;
 			exit(0);
 			break;

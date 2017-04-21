@@ -8,7 +8,9 @@
 #include "tires.h"
 
 int main() {
-	Tire tire1(frontLeft,"data.txt");
+	string fileName = "data.txt";
+	const char* dataFile = fileName.c_str();
+	Tire tire1(frontLeft,dataFile);
 	tire1.printTemps();
 }
 

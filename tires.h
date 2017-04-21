@@ -34,7 +34,7 @@ class Tire{
 		void printTemps(); //used mainly for debugging
 
 		Tire(void);			//Default constructor
-		Tire(location tireLoc, char* fileLoc);		//Parametric constructor given a tire location and file location
+		Tire(location tireLoc, const char* fileLoc);		//Parametric constructor given a tire location and file location
 		~Tire(void);		//Default destructor
 
 };//Tire
