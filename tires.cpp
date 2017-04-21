@@ -61,5 +61,24 @@ void Tire::addTemp(int temperature, char tempLocation) {
 void Tire::printTemps() {
 	int i;
 	for(i=0;i<tempOuterArray.size();i++)
-		cout << tempOuterArray[i] << "," << tempInnerArray[i]  << "," << tempMiddleArray[i] << endl;
+		cout << tempOuterArray[i] << "," << tempMiddleArray[i]  << "," <<tempInnerArray[i]<< endl;
+}
+
+int Tire::getTemp(char tempLocation){
+	
+	switch(tempLocation){
+		case 'o':
+			return(this->tempOuterArray[this->tempOuterArray.size() -1]);
+			break;
+		case 'm':
+			return(this->tempMiddleArray[this->tempMiddleArray.size() -1]);
+			break;
+		case 'i':
+			return(this->tempInnerArray[this->tempInnerArray.size() -1]);
+			break;
+		default:
+			cout<< "Error in getTemp()"<<endl;
+			exit(0);
+			break;
+	}//End Switch
 }
