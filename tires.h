@@ -1,9 +1,13 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <string>
 using namespace std;
 
 #ifndef tires_H
 #define tires_H
+
+enum location {frontLeft=1, frontRight=2,rearLeft=3,rearRight=4};
 
 class Tire{
 	private:
@@ -15,13 +19,13 @@ class Tire{
 		//Temperature integers for pulling from arrays or RT data collection(maybe)
 		int tempOuter;
 		int tempMiddle;
-		int temInner;
-
+		int tempInner;
+		int loggingRate; //logging rate in Hz
 
 	public:
 		//This will define where on the car THIS tire is
 		//We will need to come up with a tire addressing system.
-		char tireLocation;
+		location tireLocation;
 
 		int getTemp(char tempLocation);		//member function to return a temperature from one of the vectors
 		void addTemp(int temperature, char tempLocation);	//Member function to add a temperature to the correct vector
@@ -29,7 +33,7 @@ class Tire{
 
 
 		Tire(void);			//Default constructor
-		Tire(char loc);		//Parametric constructor given a location
+		Tire(location tireLoc, char* fileLoc);		//Parametric constructor given a tire location and file location
 		~Tire(void);		//Default destructor
 };//Tire
 
