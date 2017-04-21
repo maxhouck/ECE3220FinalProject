@@ -7,6 +7,7 @@ using namespace std;
 #ifndef tires_H
 #define tires_H
 
+//Enumeration defining the tire layout
 enum location {frontLeft=1, frontRight=2,rearLeft=3,rearRight=4};
 
 class Tire{
