@@ -11,27 +11,28 @@
 #include <string>
 #include <cstring>
 #include <cstdlib>
+#include "tires.h"
 using namespace std;
 
 
 Tire::Tire(void) {
-
+	//todo: finish this
 }
 
 Tire::Tire(location tireLoc, char* fileLoc) { //opens file, inputs data into temp vectors, closes file
 	//file format: outer,middle,inner
 	string line;
-	char* cstring;
+	char *token;
 	ifstream file(fileLoc);
 	if(file.is_open()) { //opening input file
-		line = strtok(cstring,",");
+
 		while(getline(file,line)) { //tokenize lines of input over 'c' and add to proper vector
-			line = strtok(NULL,",");
-			addTemp(atoi(cstring),'o');
-			line = strtok(NULL,",");
-			addTemp(atoi(cstring),'m');
-			line = strtok(NULL,",");
-			addTemp(atoi(cstring),'i');
+			token = strtok((char*)line.c_str(),",");
+			this->addTemp(atoi(token),'o');
+			token = strtok(NULL,",");
+			this->addTemp(atoi(token),'m');
+			token = strtok(NULL,",");
+			this->addTemp(atoi(token),'i');
 		}
 		file.close();
 	}
@@ -39,4 +40,25 @@ Tire::Tire(location tireLoc, char* fileLoc) { //opens file, inputs data into tem
 		cout << "Unable to open file";
 		exit(0);
 	}
+}
+
+Tire::~Tire() { //default destructor
+	//todo
+}
+
+void Tire::addTemp(int temperature, char tempLocation) {
+	switch(tempLocation) {
+		case 'o': tempOuterArray.push_back(temperature); break;
+		case 'm': tempMiddleArray.push_back(temperature); break;
+		case 'i': tempInnerArray.push_back(temperature); break;
+		default: cout << "Error in addTemp" << endl;
+			exit(0);
+			break;
+	}
+}
+
+void Tire::printTemps() {
+	int i;
+	for(i=0;i<tempOuterArray.size();i++)
+		cout << tempOuterArray[i] << "," << tempInnerArray[i]  << "," << tempMiddleArray[i] << endl;
 }
