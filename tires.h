@@ -11,7 +11,7 @@ using namespace std;
 enum location {frontLeft=1, frontRight=2,rearLeft=3,rearRight=4};
 
 class Tire{
-	private:
+	public:
 		//Temperature vectors for inputing temps from a file.
 		vector<int> tempOuterArray;
 		vector<int> tempMiddleArray;
@@ -28,9 +28,9 @@ class Tire{
 		//We will need to come up with a tire addressing system.
 		location tireLocation;
 
-		int getTemp(char tempLocation);		//member function to return the most recent temperature from one of the vectors
+		int getTemp(char tempLocation);		//member function to return the most recent temperature from one of the vectors. Throws a bad vector.
 		void addTemp(int temperature, char tempLocation);	//Member function to add a temperature to the correct vector
-		void removeTemp(char tempLocation);	//Member function to remove the least recent temperature from the chosen vector.
+		void removeTemp(char tempLocation);	//Member function to remove the least recent temperature from the chosen vector. Throws a bad vector.
 		void printTemps(); //used mainly for debugging
 
 		Tire(void);			//Default constructor
@@ -79,5 +79,16 @@ class I2C{
 
 
 };//I2C
+
+class badVector{
+	private:
+		int size;	//Contains the size of the vector trying to be accessed
+		char tireLocation; //Contains the location of the tire.
+		char vectorLocation; //Contains the vector trying to be accessed.
+	public:
+		badVector(vector<int> vect, char tireLoc, char vectorLoc);	//Default constructor to set the size.
+		void badVectorMsg_InvalidSize(void);		//Outputs the error message concerning size.
+		~badVector();					//Defualt destructor. Shouldnt need anything.
+};
 
 #endif

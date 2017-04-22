@@ -12,8 +12,16 @@ int main() {
 	const char* dataFile = fileName.c_str();
 	Tire tire1(frontLeft,dataFile);
 	tire1.printTemps();
+	int number;
+	try{
+		number = tire1.getTemp('o');
+	}
+	catch(badVector & bv){
+		bv.badVectorMsg_InvalidSize();
+		return(-1);
+	}
 	
-	cout<<tire1.getTemp('i');
+	cout<<number<<endl;
 }
 
 

@@ -65,11 +65,10 @@ void Tire::printTemps() {
 }
 
 int Tire::getTemp(char tempLocation){
-	
 	switch(tempLocation){
 		case 'o':
+			if(this->tempOuterArray.size() <= 0) throw(badVector(this->tempOuterArray, this->tireLocation, 'o'));
 			return(this->tempOuterArray[this->tempOuterArray.size() -1]);
-			break;
 		case 'm':
 			return(this->tempMiddleArray[this->tempMiddleArray.size() -1]);
 			break;
@@ -81,4 +80,56 @@ int Tire::getTemp(char tempLocation){
 			exit(0);
 			break;
 	}//End Switch
+}
+
+//Parametric constructor. This will be the only way a badVector is created.
+badVector::badVector(vector<int> vect, char tireLoc, char vectorLoc){
+	this->size = vect.size();
+	this->tireLocation = tireLoc;
+	this->vectorLocation = vectorLoc;
+}
+
+//Default destructor.
+badVector::~badVector(void){
+	//Nothing is needed here.
+}
+
+//Prints the message corresponding to the error.
+void badVector::badVectorMsg_InvalidSize(void){
+		string tireName;
+		string vectorLocation;
+		switch(this->tireLocation){
+			case 1:
+				tireName = "frontLeft";
+				break;
+			case 2:
+				tireName = "frontRight";
+				break;
+			case 3:
+				tireName = "rearLeft";
+				break;
+			case 4:
+				tireName = "rearRight";
+				break;
+			default:
+				cout<<"Error in badVectorMsg_InvalidSize"<<endl;
+				exit(2);
+				break;
+			
+		}//End switch
+		switch(this->vectorLocation){
+			case 'o':
+				vectorLocation = "outer";
+				break;
+			case 'm':
+				vectorLocation = "middle";
+			case 'i':
+				vectorLocation = "inner";
+			default:
+				cout<<"Error in badVectorMsd_InvalidSize vectorLocation switch"<<endl;
+				exit(3);
+				break;
+			
+		}//End switch
+		cout<<"Could not access "<< tireName<< " "<<vectorLocation<< " vector. This vectors size is "<< this->size<<endl;
 }
