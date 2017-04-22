@@ -7,6 +7,7 @@ using namespace std;
 #ifndef tires_H
 #define tires_H
 
+//Enumeration defining the tire layout
 enum location {frontLeft=1, frontRight=2,rearLeft=3,rearRight=4};
 
 class Tire{
@@ -27,13 +28,13 @@ class Tire{
 		//We will need to come up with a tire addressing system.
 		location tireLocation;
 
-		int getTemp(char tempLocation);		//member function to return a temperature from one of the vectors
+		int getTemp(char tempLocation);		//member function to return the most recent temperature from one of the vectors
 		void addTemp(int temperature, char tempLocation);	//Member function to add a temperature to the correct vector
-		int removeTemp(char tempLocation);	//Member function to remove the most recent temperature from the chosen vector. Returns removed temperature
+		void removeTemp(char tempLocation);	//Member function to remove the least recent temperature from the chosen vector.
 		void printTemps(); //used mainly for debugging
 
 		Tire(void);			//Default constructor
-		Tire(location tireLoc, char* fileLoc);		//Parametric constructor given a tire location and file location
+		Tire(location tireLoc, const char* fileLoc);		//Parametric constructor given a tire location and file location
 		~Tire(void);		//Default destructor
 
 };//Tire
