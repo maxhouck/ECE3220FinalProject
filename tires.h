@@ -2,42 +2,65 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <cstring>
+#include <cstdlib>
 using namespace std;
 
 #ifndef tires_H
 #define tires_H
 
 //Enumeration defining the tire layout
-enum location {frontLeft=1, frontRight=2,rearLeft=3,rearRight=4};
+enum tireLocation {frontLeft=1, frontRight=2,rearLeft=3,rearRight=4};
+enum sensorLocation {outer = 1, middle = 2, inner = 3};
+
+class Sensor{
+	friend class Tire;
+	friend class Car;
+	private:
+		string name;
+		vector<int> objTemperature;
+		sensorLocation location;
+		int ambTemperature;
+		int address;
+	public:
+		Sensor(){};
+		Sensor(string newName, sensorLocation sensorLoc,int sensorAddress);
+		~Sensor(){};
+		void addTemperature(int temperature);
+		int getTemperature(void) throw(const int);
+		void printInfo(void);
+};//Sensor
 
 class Tire{
+	friend class Car;
+	protected:
+		string name;
+		tireLocation location;
+		vector<Sensor> sensorArray;
+		
 	public:
-		//Temperature vectors for inputing temps from a file.
-		vector<int> tempOuterArray;
-		vector<int> tempMiddleArray;
-		vector<int> tempInnerArray;
-
-		//Temperature integers for pulling from arrays or RT data collection(maybe)
-		int tempOuter;
-		int tempMiddle;
-		int tempInner;
-		int loggingRate; //logging rate in Hz
-
-	public:
-		//This will define where on the car THIS tire is
-		//We will need to come up with a tire addressing system.
-		location tireLocation;
-
-		int getTemp(char tempLocation);		//member function to return the most recent temperature from one of the vectors. Throws a bad vector.
-		void addTemp(int temperature, char tempLocation);	//Member function to add a temperature to the correct vector
-		void removeTemp(char tempLocation);	//Member function to remove the least recent temperature from the chosen vector. Throws a bad vector.
-		void printTemps(); //used mainly for debugging
-
-		Tire(void);			//Default constructor
-		Tire(location tireLoc, const char* fileLoc);		//Parametric constructor given a tire location and file location
-		~Tire(void);		//Default destructor
+		Tire(void){};			//Default constructor
+		Tire(tireLocation tireLoc, string newName);		//Parametric constructor given a tire location
+		void addSensor(Sensor newSensor);
+		void removeSensor(sensorLocation sensorLoc) throw(const int);
+		void printInfo(void);
+		~Tire(void){};		//Default destructor
 
 };//Tire
+
+class Car{
+	protected:
+		string name;
+	public:
+		Car(){};
+		Car(string newName);
+		~Car(){};
+		vector<Tire> tireArray;
+		void printInfo(void);
+		void addTire(Tire newTire);
+		void removeTire(tireLocation tireLoc);
+	
+};//Car
 
 
 class mlx90614{
