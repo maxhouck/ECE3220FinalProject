@@ -9,78 +9,176 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include <cstring>
-#include <cstdlib>
 #include "tires.h"
 using namespace std;
 
+/**************************************************************************
+						TIRE CLASS METHODS
+**************************************************************************/
+/**************************************************************************
+	Tire class parametric constuctor. Takes the location of the new tire as
+the tireLocation enum as well as the name of the new tire and sets the
+corresponding values in the object.
 
-Tire::Tire(void) {
-	//Should not need anything here.
+**************************************************************************/
+Tire::Tire(tireLocation tireLoc, string newName){
+	this->location = tireLoc;
+	this->name = newName;
 }
 
-Tire::Tire(location tireLoc, const char* fileLoc) { //opens file, inputs data into temp vectors, closes file
-	//file format: outer,middle,inner
-	string line;
-	char *token;
-	ifstream file(fileLoc);
-	if(file.is_open()) { //opening input file
+/**************************************************************************
+	Tire class addSensor method. Takes a Sensor object as an arguement
+and adds it to the sensorArray vector.
 
-		while(getline(file,line)) { //tokenize lines of input over 'c' and add to proper vector
-			token = strtok((char*)line.c_str(),",");
-			this->addTemp(atoi(token),'o');
-			token = strtok(NULL,",");
-			this->addTemp(atoi(token),'m');
-			token = strtok(NULL,",");
-			this->addTemp(atoi(token),'i');
-		}
-		file.close();
+**************************************************************************/
+void Tire::addSensor(Sensor newSensor){
+	this->sensorArray.push_back(newSensor);
+}
+
+
+/**************************************************************************
+	Tire class removeSensor method. Accepts the location of the sensor
+as a sensorLocation enum and removes the selected sensor from the 
+sensorArray vector. It also checks to make sure the senssorArray vector
+is not empty. If the vector is empty, it will throw an const int equal to
+1.
+
+**************************************************************************/
+
+void Tire::removeSensor(sensorLocation sensorLoc) throw(const int){
+	//If the sensor array is empty, throw the number 1
+	if(this->sensorArray.size() <= 0){
+		throw(1);
 	}
-	else {
-		cout << "Unable to open file";
-		exit(0);
-	}
-}
-
-Tire::~Tire() { //default destructor
-	//Shouldnt need anything here. Vectors will delete themselves.
-}
-
-void Tire::addTemp(int temperature, char tempLocation) {
 	
-	switch(tempLocation) {
-		case 'o': this->tempOuterArray.push_back(temperature); break;
-		case 'm': this->tempMiddleArray.push_back(temperature); break;
-		case 'i': this->tempInnerArray.push_back(temperature); break;
-		default: cout << "Error in addTemp" << endl;
-			exit(0);
+	for(int i = 0; i < this->sensorArray.size(); i++){
+		if(this->sensorArray[i].location == sensorLoc){
+			this->sensorArray.erase(this->sensorArray.begin()+i);
 			break;
+		}
+	}
+	
+}
+
+/**************************************************************************
+	Tire class printInfo method. Prints all of the information about the 
+tire to the screen.
+**************************************************************************/
+void Tire::printInfo(void){
+	cout<<"\n Name: "<<this->name
+		<<"\n Location: "<< this->location<<endl;
+	
+	
+	cout<<" Sensor vector contents: "<<endl;
+	if(this->sensorArray.size() <= 0){
+		cout<<"  Sensor array is empty!"<<endl;
+	}else{
+		for(int i = 0; i < this->sensorArray.size(); i++){
+			sensorArray[i].printInfo();
+		}
 	}
 }
 
-void Tire::printTemps() {
-	int i;
-	for(i=0;i<tempOuterArray.size();i++)
-		cout << tempOuterArray[i] << "," << tempMiddleArray[i]  << "," <<tempInnerArray[i]<< endl;
+/**************************************************************************
+						SENSOR CLASS METHODS
+**************************************************************************/
+/**************************************************************************
+	Sensor class parametric constructor. Takes the name, the location as a
+sensorLoaction enum, and the address as arguements. Sets the corresponding
+fields to the given values.
+
+**************************************************************************/
+Sensor::Sensor(string newName, sensorLocation sensorLoc, int sensorAddress){
+	this->name = newName;
+	this->location = sensorLoc;
+	this->address = sensorAddress;
+	this->ambTemperature = 0;
 }
 
-int Tire::getTemp(char tempLocation){
-	switch(tempLocation){
-		case 'o':
-			if(this->tempOuterArray.size() <= 0) throw(badVector(this->tempOuterArray, this->tireLocation, 'o'));
-			return(this->tempOuterArray[this->tempOuterArray.size() -1]);
-		case 'm':
-			return(this->tempMiddleArray[this->tempMiddleArray.size() -1]);
-			break;
-		case 'i':
-			return(this->tempInnerArray[this->tempInnerArray.size() -1]);
-			break;
-		default:
-			cout<< "Error in getTemp()"<<endl;
-			exit(0);
-			break;
-	}//End Switch
+/**************************************************************************
+	Sensor class addTemperature method. Takes a temperature as an integer
+and adds it to the objTemperature vector.
+**************************************************************************/
+void Sensor::addTemperature(int temperature){
+	this->objTemperature.push_back(temperature);
 }
+
+/**************************************************************************
+	Sensor class getTemperature method. Returns the most recent
+temperature from the objTemperature vector. Checks to make sure the 
+objTemperature vector is not empty. If the vector is empty, returns a 
+const int equal to 2.
+**************************************************************************/
+int Sensor::getTemperature(void) throw(const int){
+	if(this->objTemperature.size() <= 0){
+		throw(2);
+	}
+	return(this->objTemperature.back());
+}
+
+/**************************************************************************
+	Sensor class printEverything method. Used for debugging, this method
+does exactly what the name implies. It will print everything contained in
+the class to the screen.
+**************************************************************************/
+void Sensor::printInfo(void){
+	cout<<"\n  "<<this->name<<" information: "
+		<<"\n   Sensor location: "<<this->location
+		<<"\n   Ambient temperature: "<<this->ambTemperature
+		<<"\n   Address : "<<this->address<<endl;
+	
+	cout<<"   Temperature vector contents: "<<endl;
+	if(this->objTemperature.size() <= 0){
+		cout<<"   The vector is empty!"<<endl;
+	}else{
+		for(int i = 0; i < this->objTemperature.size(); i++){
+			cout<<"    "<<this->objTemperature[i];
+			if(i % 3 == 0)
+				cout<<"\n";
+		}
+		cout<<"\n-------------------------------------------------------"<<endl;
+	}
+}
+
+/**************************************************************************
+						CAR CLASS METHODS
+**************************************************************************/
+/**************************************************************************
+	Car class parametric constructor. Takes the name of the car as a string
+and sets the corresponding field.
+**************************************************************************/
+Car::Car(string newName){
+	this->name = newName;
+}
+
+/**************************************************************************
+	Car class printInfo method. Prints all of the information about the car
+to the screen.
+**************************************************************************/
+void Car::printInfo(void){
+		cout<<"\n"<<this->name<<endl;
+		cout<<"Tire vector contents: "<<endl;
+		if(this->tireArray.size() <= 0){
+			cout<<"Tire array is empty!"<<endl;
+		}else{
+			for(int i = 0; i < this->tireArray.size(); i++){
+					cout<<"\n Tire "<<i<<endl;
+					tireArray[i].printInfo();
+			}
+		}
+		cout<<"------------------------------------"<<endl;
+}
+
+/**************************************************************************
+	Car class addTire method. Takes a Tire object as an arguement and 
+adds it to the tire vector.
+**************************************************************************/
+void Car::addTire(Tire newTire){
+	this->tireArray.push_back(newTire);
+}
+
+
+
 
 //Parametric constructor. This will be the only way a badVector is created.
 badVector::badVector(vector<int> vect, char tireLoc, char vectorLoc){
