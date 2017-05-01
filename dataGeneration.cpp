@@ -16,12 +16,12 @@ int main(void){
 	ofstream file2("rearLeft.txt", ios::out | ios::trunc);;
 	ofstream file3("frontRight.txt", ios::out | ios::trunc);;
 	ofstream file4("rearRight.txt", ios::out | ios::trunc);;
-
+	srand(time(NULL));
 	if(!file1.is_open() || !file2.is_open() || !file3.is_open() || !file4.is_open()){
 		cout<<"\nCould not open the file"<<endl;
 		return(1);
 	}
-	srand(time(NULL));
+	
 	for(int i = 0; i < dataPoints; i ++){
 		for(int x = 0; x < 3; x++){
 			
@@ -33,7 +33,7 @@ int main(void){
 		}
 		file1<<"\n";
 	}
-	srand(time(NULL));
+	
 	for(int i = 0; i < dataPoints; i ++){
 		for(int x = 0; x < 3; x++){
 			
@@ -45,7 +45,7 @@ int main(void){
 		}
 		file2<<"\n";
 	}
-	srand(time(NULL));
+	
 	for(int i = 0; i < dataPoints; i ++){
 		for(int x = 0; x < 3; x++){
 			
@@ -57,7 +57,7 @@ int main(void){
 		}
 		file3<<"\n";
 	}
-	srand(time(NULL));
+	
 	for(int i = 0; i < dataPoints; i ++){
 		for(int x = 0; x < 3; x++){
 			
