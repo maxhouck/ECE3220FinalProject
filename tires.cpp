@@ -170,6 +170,22 @@ void Car::printInfo(void){
 }
 
 /**************************************************************************
+	Car class getTemperature method. Takes the tire location, 
+sensor location (as tireLocation and sensorLocation respectively), and the
+index of the temperature value. Returns the temperature at that index as
+an integer.
+**************************************************************************/
+int Car::getTemperature(tireLocation tireLoc, sensorLocation sensorLoc, int index){
+	return(this->tireArray[tireLoc-1].sensorArray[sensorLoc-1].objTemperature[index]);
+}
+/**************************************************************************
+	Car class numDataPoints method. Returns the number of data points in
+the temperature vectors as an integer.
+**************************************************************************/
+int Car::numDataPoints(void){
+	return(this->tireArray[0].sensorArray[0].objTemperature.size());
+}
+/**************************************************************************
 	Car class addTire method. Takes a Tire object as an arguement and 
 adds it to the tire vector.
 **************************************************************************/

@@ -4,14 +4,19 @@
  *  Created on: Apr 21, 2017
  *      Author: MizzouRacing
  */
-
+#include<windows.h>
 #include "tires.h"
+#include<graphics.h>
 
 void programStart(void);
 void mainOptionMenu(void);
 void dataVisualization(void);
 void dataVisualizationWelcomeMessage(void);
+void guiSetup(RECT*, RECT*, RECT*, RECT*);
+void simulation(Car* car, RECT*, RECT*, RECT*, RECT*);
 Car* carSetup(void);
+
+
 int main() {
 	try{
 		programStart();
@@ -56,13 +61,150 @@ void mainOptionMenu(void){
 }
 
 void dataVisualization(void){
+	string userInput;
+	int pixel = 0;
+	RECT rectangle1;
+	RECT* frontLeft = &rectangle1;
+	RECT rectangle2;
+	RECT* frontRight = &rectangle2;
+	RECT rectangle3;
+	RECT* rearLeft = &rectangle3;
+	RECT rectangle4;
+	RECT* rearRight = &rectangle4;
+	
 	Car* car = carSetup();
 	
-	car->printInfo();
+	cout<<"\n Car creation and GUI setup complete.\nPress any key to continue"<<endl;
 	
+	getline(cin, userInput);
+	
+	simulation(car, frontLeft, frontRight, rearLeft, rearRight);
 	
 	delete car;
 	
+}
+
+
+void simulation(Car* car, RECT* fl, RECT* fr, RECT* rl, RECT* rr){
+	HWND myconsole = GetConsoleWindow();
+	HDC mydc = GetDC(myconsole);
+	HBRUSH myBrush;
+	int red, blue, green;
+	int boxSize = 100;
+	int RGB; 
+	for(int i = 0; i < car->numDataPoints(); i++){
+		double flSlope1 = (double)(car->getTemperature(frontLeft, outer, i) - car->getTemperature(frontLeft, middle, i))/(0-(boxSize/2));
+		double flSlope2 = (double)(car->getTemperature(frontLeft, middle, i) - car->getTemperature(frontLeft, inner, i))/((boxSize/2)-(boxSize));
+		double frSlope1 = (double)(car->getTemperature(frontRight, outer, i) - car->getTemperature(frontRight, middle, i))/(0-(boxSize/2));
+		double frSlope2 = (double)(car->getTemperature(frontRight, middle, i) - car->getTemperature(frontRight, inner, i))/((boxSize/2)-(boxSize));
+		double rlSlope1 = (double)(car->getTemperature(rearLeft, outer, i) - car->getTemperature(rearLeft, middle, i))/(0-(boxSize/2));
+		double rlSlope2 = (double)(car->getTemperature(rearLeft, middle, i) - car->getTemperature(rearLeft, inner, i))/((boxSize/2)-(boxSize));
+		double rrSlope1 = (double)(car->getTemperature(rearRight, outer, i) - car->getTemperature(rearRight, middle, i))/(0-(boxSize/2));
+		double rrSlope2 = (double)(car->getTemperature(rearRight, middle, i) - car->getTemperature(rearRight, inner, i))/((boxSize/2)-(boxSize));
+		//cout<<endl<<car->getTemperature(frontLeft, outer, i)<<" , "<<car->getTemperature(frontLeft, middle, i)<<" , "<<car->getTemperature(frontLeft, inner, i)<<endl;
+		for(int x = 0; x < boxSize; x++){
+			
+			//Front left
+			fl->left = x + 500;
+			fl->top = 300;
+			fl->right = fl->left + 1;
+			fl->bottom = fl->top + boxSize;
+			
+			if(x <= boxSize/2){
+				RGB = (510/110)*(car->getTemperature(frontLeft, outer, i) +(flSlope1 * x));
+			}else if(x > boxSize/2){
+				RGB = (510/110)*(car->getTemperature(frontLeft, middle, i) +(flSlope2 *(x-(boxSize/2))));
+			}
+			//cout<<" "<<RGB;
+			if(RGB <= 255){
+				blue = (-RGB) + 255;
+				red = 0;
+				green = (RGB);
+			}else if(RGB >= 255){
+				blue = 0;
+				green = (-RGB) + 510;
+				red = (RGB) - 255;
+			}
+			myBrush = CreateSolidBrush(RGB(red, green, blue));
+			FillRect(mydc, fl, myBrush);
+			DeleteObject(myBrush);
+			//Front right
+			fr->left = x + 650;
+			fr->top = 300;
+			fr->right = fr->left+1;
+			fr->bottom = fr->top + boxSize;
+			
+			if(x <= boxSize/2){
+				RGB = (510/110)*(car->getTemperature(frontRight, outer, i) +(frSlope1 * x));
+			}else if(x > boxSize/2){
+				RGB = (510/110)*(car->getTemperature(frontRight, middle, i) +(frSlope2 *(x-(boxSize/2))));
+			}
+			if(RGB <= 255){
+				blue = (-RGB) + 255;
+				red = 0;
+				green = (RGB);
+			}else if(RGB >= 255){
+				blue = 0;
+				green = (-RGB) + 510;
+				red = (RGB) - 255;
+			}
+			myBrush = CreateSolidBrush(RGB(red, green, blue));
+			FillRect(mydc, fr, myBrush);
+			DeleteObject(myBrush);
+			//Rear left
+			rl->left = x + 500;
+			rl->top = 450;
+			rl->right = rl->left+1;
+			rl->bottom = rl->top + boxSize;
+			
+			if(x <= boxSize/2){
+				RGB = (510/110)*(car->getTemperature(rearLeft, outer, i) +(rlSlope1 * x));
+			}else if(x > boxSize/2){
+				RGB = (510/110)*(car->getTemperature(rearLeft, middle, i) +(rlSlope2 *(x-(boxSize/2))));
+			}
+			if(RGB <= 255){
+				blue = (-RGB) + 255;
+				red = 0;
+				green = (RGB);
+			}else if(RGB >= 255){
+				blue = 0;
+				green = (-RGB) + 510;
+				red = (RGB) - 255;
+			}
+			myBrush = CreateSolidBrush(RGB(red, green, blue));
+			FillRect(mydc, rl, myBrush);
+			DeleteObject(myBrush);
+			//Rear Right
+			rr->left = x + 650;
+			rr->top = 450;
+			rr->right = rr->left+1;
+			rr->bottom = rr->top + boxSize;
+			
+			if(x <= boxSize/2){
+				RGB = (510/110)*(car->getTemperature(rearRight, outer, i) +(rrSlope1 * x));
+			}else if(x > boxSize/2){
+				RGB = (510/110)*(car->getTemperature(rearRight, middle, i) +(rrSlope2 *(x-(boxSize/2))));
+			}
+			if(RGB <= 255){
+				blue = (-RGB) + 255;
+				red = 0;
+				green = (RGB);
+			}else if(RGB >= 255){
+				blue = 0;
+				green = (-RGB) + 510;
+				red = (RGB) - 255;
+			}
+			myBrush = CreateSolidBrush(RGB(red, green, blue));
+			FillRect(mydc, rr, myBrush);
+			DeleteObject(myBrush);
+		
+		
+	
+		}
+		Sleep(200);
+	
+	
+	}
 }
 
 void dataVisualizationWelcomeMessage(void){
@@ -236,7 +378,6 @@ Car* carSetup(void){
 		car->addTire(FR);
 		car->addTire(RL);
 		car->addTire(RR);
-		
 		
 		return(car);
 	}

@@ -59,6 +59,8 @@ class Car{
 		void printInfo(void);
 		void addTire(Tire newTire);
 		void removeTire(tireLocation tireLoc);
+		int getTemperature(tireLocation tireLoc, sensorLocation sensorLoc, int);
+		int numDataPoints(void);
 	
 };//Car
 
