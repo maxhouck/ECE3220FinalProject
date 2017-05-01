@@ -92,11 +92,18 @@ void realTimeDemo(void){
 	int readResult = 0;
 	char obj[1];
 	int data = 0;
+	int holdData = 0;
 	while(SP->IsConnected())
 	{
 		readResult = SP->ReadData(incomingData,dataLength);
         incomingData[readResult] = 0;
 		data = atoi(incomingData);
+		if(holdData == 0){
+			data = data;
+		}else if(data > holdData * 1.5 || data < holdData*(2/3)){
+			data = holdData;
+		}
+		holdData = data;
 		cout<<data<<endl;
 		Sleep(250);
 	}
@@ -244,7 +251,7 @@ void simulation(Car* car, RECT* fl, RECT* fr, RECT* rl, RECT* rr){
 		
 	
 		}
-		Sleep(200);
+		Sleep(20);
 	
 	
 	}
