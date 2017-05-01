@@ -7,6 +7,7 @@
 #include<windows.h>
 #include "tires.h"
 #include<graphics.h>
+#include "SerialClass.h"
 
 void programStart(void);
 void mainOptionMenu(void);
@@ -14,6 +15,7 @@ void dataVisualization(void);
 void dataVisualizationWelcomeMessage(void);
 void guiSetup(RECT*, RECT*, RECT*, RECT*);
 void simulation(Car* car, RECT*, RECT*, RECT*, RECT*);
+void realTimeDemo(void);
 Car* carSetup(void);
 
 
@@ -42,7 +44,7 @@ void programStart(void){
 		getline(cin, userInput);
 	
 		if(userInput == "1"){
-		
+			realTimeDemo();
 		}else if(userInput == "2"){
 			dataVisualization();
 		}else if(userInput == "3"){
@@ -58,6 +60,47 @@ void mainOptionMenu(void){
 		<<"\n   1)Real time data sensor visualization"
 		<<"\n   2)Data visualization from file and video"
 		<<"\n   3)Quit"<<endl;
+}
+
+void realTimeDemo(void){
+	Serial* SP;
+	while(1){
+		try{
+			SP = new Serial("COM4"); //We may need to adjust this as necessary
+			break;
+		}
+		catch(const int x){
+			if(x == 1){
+				cout<<"\n Please connect the arduino!"<<endl;
+				Sleep(3000);
+			}else if(x == 2){
+				cout<<"\n Unknown error!"<<endl;
+			}
+		}
+		catch(...){
+			cout<<"\n Catch all realTimeDemo. Should not be here!"<<endl;
+		}
+	}
+	if (SP->IsConnected()){
+		cout<<"\n Ardiuno Connected!"<<endl;
+	}else{
+		cout<<"\n Arduino not connected?.. Terminating!"<<endl;
+	}
+	
+	char incomingData[256] = "";
+	int dataLength = 255;
+	int readResult = 0;
+	char obj[1];
+	int data = 0;
+	while(SP->IsConnected())
+	{
+		readResult = SP->ReadData(incomingData,dataLength);
+        incomingData[readResult] = 0;
+		data = atoi(incomingData);
+		cout<<data<<endl;
+		Sleep(250);
+	}
+	
 }
 
 void dataVisualization(void){
