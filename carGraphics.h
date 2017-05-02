@@ -15,7 +15,7 @@ class BaseGraphics{
 		virtual ~BaseGraphics(){};
 		
 		//How do we move?
-		void move(int dx, int dy);
+		virtual void move(int dx, int dy);
 	
 };
 
@@ -25,7 +25,10 @@ class CarGraphics : public BaseGraphics{
 		//What shapes are we using?
 		RECT frontLeft, frontRight, rearLeft, rearRight;
 		//How big are they?
-		int rectSize;
+		int flRectSize;
+		int frRectSize;
+		int rlRectSize;
+		int rrRectSize;
 		//Where will they be with respect to the center point?
 		int xCord_offsetStart;
 		int yCord_offsetStart;
@@ -51,15 +54,21 @@ class CarGraphics : public BaseGraphics{
 		void setDataRearRight(double outer, double middle, double inner);
 		
 		//How do we calculate the gradients?
-		vector<double> calculateGradient(double point1, double point2, double point3);
+		vector<double> calculateGradient(double point1, double point2, double point3, int rectSize);
 		
 		//How do we change the shape characteristics?
 		void updateRectangles(void);
 		void updateGradients(void);
 		void resize(int newSize);
+		void flResize(int newSize);
+		void frResize(int newSize);
+		void rlResize(int newSize);
+		void rrResize(int newSize);
+		void updateOffset(int nx, int ny);
 		void horizontalShift(int dx);
 		void verticalShift(int dy);
 		void setRange(int low, int high);
+		void move(int nx, int ny);
 		
 		//How do we draw the graphics to the screen?
 		void drawGraphics(HDC* mydc); 

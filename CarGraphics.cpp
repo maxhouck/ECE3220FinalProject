@@ -22,18 +22,21 @@ BaseGraphics::BaseGraphics(int _x, int _y){
 	this->y = _y;
 }
 
-void BaseGraphics::move(int dx, int dy){
-	this->x = _x
-	this->y = _y
+void BaseGraphics::move(int _x, int _y){
+	this->x = _x;
+	this->y = _y;
 }
 
 /*****************************************************************************
 							CarGraphics
 *****************************************************************************/
 CarGraphics::CarGraphics() : BaseGraphics(){
-	this->rectSize = 50;
-	this->xCord_offsetStart = 100;
-	this->yCord_offsetStart = 100;
+	this->flRectSize = 50;
+	this->frRectSize = 50;
+	this->rlRectSize = 50;
+	this->rrRectSize = 50;
+	this->xCord_offsetStart = 200;
+	this->yCord_offsetStart = 200;
 	
 	this->setDataFrontLeft(0,0,0);
 	this->setDataFrontRight(0,0,0);
@@ -48,7 +51,11 @@ CarGraphics::CarGraphics() : BaseGraphics(){
 }
 
 CarGraphics::CarGraphics(int x, int y, int size, int xOffset, int yOffset) : BaseGraphics(x, y){
-	this->rectSize = size;
+	this->flRectSize = size;
+	this->frRectSize = size;
+	this->rlRectSize = size;
+	this->rrRectSize = size;
+	
 	this->xCord_offsetStart = xOffset;
 	this->yCord_offsetStart = yOffset;
 	
@@ -65,39 +72,49 @@ CarGraphics::CarGraphics(int x, int y, int size, int xOffset, int yOffset) : Bas
 }
 
 void CarGraphics::setDataFrontLeft(double outer, double middle, double inner){
-	this->flDataPointOutside = outer;
-	this->flDataPointMiddle = middle;
-	this->flDataPointInside = inner;
+	this->flDataPointOutside = outer - this->tempLow;
+	this->flDataPointMiddle = middle - this->tempLow;
+	this->flDataPointInside = inner - this->tempLow;
 	this->updateGradients();
 }
 
 void CarGraphics::setDataFrontRight(double outer, double middle, double inner){
-	this->frDataPointOutside = outer;
-	this->frDataPointMiddle = middle;
-	this->frDataPointInside = inner;
+	this->frDataPointOutside = outer - this->tempLow;
+	this->frDataPointMiddle = middle - this->tempLow;
+	this->frDataPointInside = inner - this->tempLow;
 	this->updateGradients();
 }
 
 void CarGraphics::setDataRearLeft(double outer, double middle, double inner){
-	this->rlDataPointOutside = outer;
-	this->rlDataPointMiddle = middle;
-	this->rlDataPointInside = inner;
+	this->rlDataPointOutside = outer - this->tempLow;
+	this->rlDataPointMiddle = middle - this->tempLow;
+	this->rlDataPointInside = inner - this->tempLow;
 	this->updateGradients();
 }
 void CarGraphics::setDataRearRight(double outer, double middle, double inner){
-	this->rrDataPointOutside = outer;
-	this->rrDataPointMiddle = middle;
-	this->rrDataPointInside = inner;
+	this->rrDataPointOutside = outer - this->tempLow;
+	this->rrDataPointMiddle = middle - this->tempLow;
+	this->rrDataPointInside = inner - this->tempLow;
 	this->updateGradients();
 }
 
-vector<double> CarGraphics::calculateGradient(double point1, double point2, double point3){
+void CarGraphics::move(int nx, int ny){
+	this->x = nx;
+	this->y = ny;
+	this->updateGradients();
+	this->updateRectangles();
+}
+
+vector<double> CarGraphics::calculateGradient(double point1, double point2, double point3, int rectSize){
 	double slope1, slope2, slope3, slope4;
+	double quaterRect = rectSize / 4;
+	double halfRect = rectSize / 2;
+	double threeQuaterRect = rectSize *((double)(3) / (double)(4));
 	vector<double> slopes;
-	slope1 = (this->tempLow - point1) / (0 - (this->rectSize / 4));
-	slope2 = (point1 - point2) / ((this->rectSize / 4) - (this->rectSize / 2));
-	slope3 = (point2 - point3) / ((this->rectSize /2) - (this->rectSize * 3 / 4));
-	slope4 = (point3 - this->tempLow) / ((this->rectSize * 3 / 4) - this->rectSize);
+	slope1 = (0 - point1) / (0 - quaterRect);
+	slope2 = (point1 - point2) / (quaterRect - halfRect);
+	slope3 = (point2 - point3) / (halfRect - threeQuaterRect);
+	slope4 = (point3 - 0) / (threeQuaterRect - rectSize);
 	
 	slopes.push_back(slope1);
 	slopes.push_back(slope2);
@@ -109,45 +126,77 @@ vector<double> CarGraphics::calculateGradient(double point1, double point2, doub
 void CarGraphics::updateRectangles(void){
 	this->frontLeft.left = this->x - this->xCord_offsetStart;
 	this->frontLeft.right = this->frontLeft.left + 1;
-	this->frontLeft.top = this->y + this->yCord_offsetStart;
-	this->frontLeft.bottom = this->frontLeft.top + this->rectSize;
+	this->frontLeft.top = this->y - this->yCord_offsetStart;
+	this->frontLeft.bottom = this->frontLeft.top + this->flRectSize;
 	
 	this->frontRight.left = this->x + this->xCord_offsetStart;
 	this->frontRight.right = this->frontRight.left + 1;
-	this->frontRight.top = this->y + this->yCord_offsetStart;
-	this->frontLeft.bottom = this->frontRight.top + this->rectSize;
+	this->frontRight.top = this->y - this->yCord_offsetStart;
+	this->frontRight.bottom = this->frontRight.top + this->frRectSize;
 	
 	this->rearLeft.left = this->x - this->xCord_offsetStart;
 	this->rearLeft.right = this->rearLeft.left + 1;
-	this->rearLeft.top = this->y - this->yCord_offsetStart;
-	this->rearLeft.bottom = this->rearLeft.top + this->rectSize;
+	this->rearLeft.top = this->y + this->yCord_offsetStart;
+	this->rearLeft.bottom = this->rearLeft.top + this->rlRectSize;
 	
 	this->rearRight.left = this->x + this->xCord_offsetStart;
 	this->rearRight.right = this->rearRight.left + 1;
-	this->rearRight.top = this->y - this->yCord_offsetStart;
-	this->rearRight.bottom = this->rearRight.top + this->rectSize;
+	this->rearRight.top = this->y + this->yCord_offsetStart;
+	this->rearRight.bottom = this->rearRight.top + this->rrRectSize;
 }
 
 void CarGraphics::updateGradients(void){
 	this->flGradient = this->calculateGradient(this->flDataPointOutside,
 												this->flDataPointMiddle,
-												this->flDataPointInside);
+												this->flDataPointInside,
+												this->flRectSize);
 							
 	this->frGradient = this->calculateGradient(this->frDataPointOutside,
 												this->frDataPointMiddle,
-												this->frDataPointInside);
+												this->frDataPointInside,
+												this->frRectSize);
 											
 	this->rlGradient = this->calculateGradient(this->rlDataPointOutside,
 												this->rlDataPointMiddle,
-												this->rlDataPointInside);
+												this->rlDataPointInside,
+												this->rlRectSize);
 												
 	this->rrGradient = this->calculateGradient(this->rrDataPointOutside,
 												this->rrDataPointMiddle,
-												this->rrDataPointInside);
+												this->rrDataPointInside,
+												this->rrRectSize);
 }
 
 void CarGraphics::resize(int newSize){
-	this->rectSize = newSize;
+	this->flRectSize = newSize;
+	this->frRectSize = newSize;
+	this->rlRectSize = newSize;
+	this->rrRectSize = newSize;
+	
+	this->updateGradients();
+	this->updateRectangles();
+}
+
+void CarGraphics::flResize(int newSize){
+	this->flRectSize = newSize;
+	this->updateGradients();
+	this->updateRectangles();
+}
+
+void CarGraphics::frResize(int newSize){
+	this->frRectSize = newSize;
+	this->updateGradients();
+	this->updateRectangles();
+}
+
+void CarGraphics::rlResize(int newSize){
+	this->rlRectSize = newSize;
+	this->updateGradients();
+	this->updateRectangles();
+}
+
+void CarGraphics::rrResize(int newSize){
+	this->rrRectSize = newSize;
 	this->updateGradients();
 	this->updateRectangles();
 }
@@ -168,25 +217,60 @@ void CarGraphics::setRange(int low, int high){
 	this->updateGradients();
 }
 
+void CarGraphics::updateOffset(int nx, int ny){
+	this->xCord_offsetStart = nx;
+	this->yCord_offsetStart = ny;
+	this->updateGradients();
+	this->updateRectangles();
+}
 //Need to implement a moving of rectangles.**********************************************
 
 
 void CarGraphics::drawGraphics(HDC* mydc){
 	HBRUSH myBrush;
-	int RBG;
-	int tempRange = this->tempHigh - this->tempLow;
-	for(int x = 0; x < this->rectSize; x++)
-		this->frontLeft.left = x + ;
-		this->frontLeft.top = 300;
-		this->frontLeft.right = this->frontLeft.left + 1;
-		this->frontLeft.bottom = this->frontLeft.top + boxSize;
+	RECT tempRect;
 	
-		if(x <= boxSize/2){
-			RGB = (510/tempRange)*(car->getTemperature(frontLeft, outer, i) +(flSlope1 * x));
-		}else if(x > boxSize/2){
-			RGB = (510/tempRange)*(car->getTemperature(frontLeft, middle, i) +(flSlope2 *(x-(boxSize/2))));
+	double flQuaterRect = this->flRectSize / 4;
+	double flHalfRect = this->flRectSize / 2;
+	double flThreeQuaterRect = this->flRectSize *((double)(3) / (double)(4));
+	
+	double frQuaterRect = this->frRectSize / 4;
+	double frHalfRect = this->frRectSize / 2;
+	double frThreeQuaterRect = this->frRectSize *((double)(3) / (double)(4));
+	
+	double rlQuaterRect = this->rlRectSize / 4;
+	double rlHalfRect = this->rlRectSize / 2;
+	double rlThreeQuaterRect = this->rlRectSize *((double)(3) / (double)(4));
+	
+	double rrQuaterRect = this->rrRectSize / 4;
+	double rrHalfRect = this->rrRectSize / 2;
+	double rrThreeQuaterRect = this->rrRectSize *((double)(3) / (double)(4));
+	
+	int red, green, blue;
+	int RGB;
+	int tempRange = this->tempHigh - this->tempLow;
+	for(double i = 0; i < this->flRectSize; i++){
+		
+		//FrontLeft
+		tempRect.left = i + this->frontLeft.left;
+		tempRect.top = this->frontLeft.top;
+		tempRect.right = tempRect.left + 1;
+		tempRect.bottom = this->frontLeft.bottom;
+	
+		if(i <= flQuaterRect){
+			RGB = (510/tempRange)*(0 +(this->flGradient[0] * i));
 		}
-	//cout<<" "<<RGB;
+		else if(i > flQuaterRect && i <= flHalfRect){
+			RGB = (510/tempRange)*(this->flDataPointOutside + (this->flGradient[1] *(i - flQuaterRect)));
+		}
+		else if(i > flHalfRect && i <= flThreeQuaterRect){
+			RGB = (510/tempRange)*(this->flDataPointMiddle + (this->flGradient[2] *(i - flHalfRect)));
+		}
+		else if(i > flThreeQuaterRect){
+			RGB = (510/tempRange)*(this->flDataPointInside + (this->flGradient[3] *(i - flThreeQuaterRect)));
+		}
+		
+	    //cout<<"\n "<<i<<" "<<RGB;
 		if(RGB <= 255){
 			blue = (-RGB) + 255;
 			red = 0;
@@ -197,79 +281,111 @@ void CarGraphics::drawGraphics(HDC* mydc){
 			red = (RGB) - 255;
 		}
 		myBrush = CreateSolidBrush(RGB(red, green, blue));
-		FillRect(mydc, fl, myBrush);
+		FillRect(*mydc, &tempRect, myBrush);
 		DeleteObject(myBrush);
+	}
+	for(double i = 0; i < this->frRectSize; i++){
+		//Front Right
+		tempRect.left = i + this->frontRight.left;
+		tempRect.top = this->frontRight.top;
+		tempRect.right = tempRect.left + 1;
+		tempRect.bottom = this->frontRight.bottom;
 	
-	
-	//Front right
-	fr->left = x + 650;
-	fr->top = 300;
-	fr->right = fr->left+1;
-	fr->bottom = fr->top + boxSize;
-
-	if(x <= boxSize/2){
-		RGB = (510/tempRange)*(car->getTemperature(frontRight, outer, i) +(frSlope1 * x));
-	}else if(x > boxSize/2){
-		RGB = (510/tempRange)*(car->getTemperature(frontRight, middle, i) +(frSlope2 *(x-(boxSize/2))));
-	}
-	if(RGB <= 255){
-		blue = (-RGB) + 255;
-		red = 0;
-		green = (RGB);
-	}else if(RGB >= 255){
-		blue = 0;
-		green = (-RGB) + 510;
-		red = (RGB) - 255;
-	}
-	myBrush = CreateSolidBrush(RGB(red, green, blue));
-	FillRect(mydc, fr, myBrush);
-	DeleteObject(myBrush);
-	//Rear left
-	rl->left = x + 500;
-	rl->top = 450;
-	rl->right = rl->left+1;
-	rl->bottom = rl->top + boxSize;
-	
-	if(x <= boxSize/2){
-		RGB = (510/tempRange)*(car->getTemperature(rearLeft, outer, i) +(rlSlope1 * x));
-	}else if(x > boxSize/2){
-		RGB = (510/tempRange)*(car->getTemperature(rearLeft, middle, i) +(rlSlope2 *(x-(boxSize/2))));
-	}
-	if(RGB <= 255){
-		blue = (-RGB) + 255;
-		red = 0;
-		green = (RGB);
-	}else if(RGB >= 255){
-		blue = 0;
-		green = (-RGB) + 510;
-		red = (RGB) - 255;
-	}
-	myBrush = CreateSolidBrush(RGB(red, green, blue));
-	FillRect(mydc, rl, myBrush);
-	DeleteObject(myBrush);
-	//Rear Right
-	rr->left = x + 650;
-	rr->top = 450;
-	rr->right = rr->left+1;
-	rr->bottom = rr->top + boxSize;
-	
-	if(x <= boxSize/2){
-		RGB = (510/tempRange)*(car->getTemperature(rearRight, outer, i) +(rrSlope1 * x));
-	}else if(x > boxSize/2){
-		RGB = (510/tempRange)*(car->getTemperature(rearRight, middle, i) +(rrSlope2 *(x-(boxSize/2))));
-	}
-	if(RGB <= 255){
-		blue = (-RGB) + 255;
-		red = 0;
-		green = (RGB);
-	}else if(RGB >= 255){
-		blue = 0;
-		green = (-RGB) + 510;
-		red = (RGB) - 255;
-	}
-	myBrush = CreateSolidBrush(RGB(red, green, blue));
-	FillRect(mydc, rr, myBrush);
-	DeleteObject(myBrush);
-	
+		if(i <= frQuaterRect){
+			RGB = (510/tempRange)*(0 +(this->frGradient[0] * i));
+		}
+		else if(i > frQuaterRect && i <= frHalfRect){
+			RGB = (510/tempRange)*(this->frDataPointOutside + (this->frGradient[1] *(i - frQuaterRect)));
+		}
+		else if(i > frHalfRect && i <= frThreeQuaterRect){
+			RGB = (510/tempRange)*(this->frDataPointMiddle + (this->frGradient[2] *(i - frHalfRect)));
+		}
+		else if(i > frThreeQuaterRect){
+			RGB = (510/tempRange)*(this->frDataPointInside + (this->frGradient[3] *(i - frThreeQuaterRect)));
+		}
 		
+	    //cout<<"\n "<<i<<" "<<RGB;
+		if(RGB <= 255){
+			blue = (-RGB) + 255;
+			red = 0;
+			green = (RGB);
+		}else if(RGB >= 255){
+			blue = 0;
+			green = (-RGB) + 510;
+			red = (RGB) - 255;
+		}
+		myBrush = CreateSolidBrush(RGB(red, green, blue));
+		FillRect(*mydc, &tempRect, myBrush);
+		DeleteObject(myBrush);
+	}
+	for(double i = 0; i < this->rlRectSize; i++){
+		
+		//Rear Left
+		tempRect.left = i + this->rearLeft.left;
+		tempRect.top = this->rearLeft.top;
+		tempRect.right = tempRect.left + 1;
+		tempRect.bottom = this->rearLeft.bottom;
+	
+		if(i <= rlQuaterRect){
+			RGB = (510/tempRange)*(0 +(this->rlGradient[0] * i));
+		}
+		else if(i > rlQuaterRect && i <= rlHalfRect){
+			RGB = (510/tempRange)*(this->rlDataPointOutside + (this->rlGradient[1] *(i - rlQuaterRect)));
+		}
+		else if(i > rlHalfRect && i <= rlThreeQuaterRect){
+			RGB = (510/tempRange)*(this->rlDataPointMiddle + (this->rlGradient[2] *(i - rlHalfRect)));
+		}
+		else if(i > rlThreeQuaterRect){
+			RGB = (510/tempRange)*(this->rlDataPointInside + (this->rlGradient[3] *(i - rlThreeQuaterRect)));
+		}
+		
+	    //cout<<"\n "<<i<<" "<<RGB;
+		if(RGB <= 255){
+			blue = (-RGB) + 255;
+			red = 0;
+			green = (RGB);
+		}else if(RGB >= 255){
+			blue = 0;
+			green = (-RGB) + 510;
+			red = (RGB) - 255;
+		}
+		myBrush = CreateSolidBrush(RGB(red, green, blue));
+		FillRect(*mydc, &tempRect, myBrush);
+		DeleteObject(myBrush);
+	}
+	for(double i = 0; i < this->rrRectSize; i++){
+		//Rear right
+		tempRect.left = i + this->rearRight.left;
+		tempRect.top = this->rearRight.top;
+		tempRect.right = tempRect.left + 1;
+		tempRect.bottom = this->rearRight.bottom;
+	
+		if(i <= rrQuaterRect){
+			RGB = (510/tempRange)*(0 +(this->rrGradient[0] * i));
+		}
+		else if(i > rrQuaterRect && i <= rrHalfRect){
+			RGB = (510/tempRange)*(this->rrDataPointOutside + (this->rrGradient[1] *(i - rrQuaterRect)));
+		}
+		else if(i > rrHalfRect && i <= rrThreeQuaterRect){
+			RGB = (510/tempRange)*(this->rrDataPointMiddle + (this->rrGradient[2] *(i - rrHalfRect)));
+		}
+		else if(i > rrThreeQuaterRect){
+			RGB = (510/tempRange)*(this->rrDataPointInside + (this->rrGradient[3] *(i - rrThreeQuaterRect)));
+		}
+		
+	    //cout<<"\n "<<i<<" "<<RGB;
+		if(RGB <= 255){
+			blue = (-RGB) + 255;
+			red = 0;
+			green = (RGB);
+		}else if(RGB >= 255){
+			blue = 0;
+			green = (-RGB) + 510;
+			red = (RGB) - 255;
+		}
+		myBrush = CreateSolidBrush(RGB(red, green, blue));
+		FillRect(*mydc, &tempRect, myBrush);
+		DeleteObject(myBrush);
+		
+	}
 }
