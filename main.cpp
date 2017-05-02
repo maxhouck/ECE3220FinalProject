@@ -6,7 +6,6 @@
  */
 #include<windows.h>
 #include "tires.h"
-#include<graphics.h>
 #include "SerialClass.h"
 
 void programStart(void);
@@ -63,7 +62,13 @@ void mainOptionMenu(void){
 }
 
 void realTimeDemo(void){
-	Serial* SP;
+	Serial* SP = new Serial("COM4");
+	HWND myconsole = GetConsoleWindow();
+	HDC mydc = GetDC(myconsole);
+	HBRUSH myBrush;
+	int red, blue, green;
+	int RGB;
+	/*
 	while(1){
 		try{
 			SP = new Serial("COM4"); //We may need to adjust this as necessary
@@ -80,25 +85,85 @@ void realTimeDemo(void){
 		catch(...){
 			cout<<"\n Catch all realTimeDemo. Should not be here!"<<endl;
 		}
-	}
+	}*/
+	
 	if (SP->IsConnected()){
 		cout<<"\n Ardiuno Connected!"<<endl;
 	}else{
 		cout<<"\n Arduino not connected?.. Terminating!"<<endl;
 	}
-	
+	char* token;
+	string incomingDataString;
 	char incomingData[256] = "";
 	int dataLength = 255;
 	int readResult = 0;
-	char obj[1];
-	int data = 0;
-	while(SP->IsConnected())
+	int data1 = 0;
+	int data2 = 0;
+	int data3 = 0;
+	int data1Hold, data2Hold, data3Hold;
+	int slope1, slope2;
+	RECT rectangle1;
+	while(1)
 	{
+		data1Hold = data1;
+		data2Hold = data2;
+		data3Hold = data3;
 		readResult = SP->ReadData(incomingData,dataLength);
-        incomingData[readResult] = 0;
-		data = atoi(incomingData);
-		cout<<data<<endl;
-		Sleep(250);
+		
+		token = strtok(incomingData,",");
+		data1 = atoi(token);
+		token = strtok(NULL, ",");
+		data2 = atoi(token);
+		token = strtok(NULL, ",");
+		data3 = atoi(token);
+		if(data1Hold == 0){
+			data1 = data1;
+		}else if(data1 > data1Hold*1.5 || data1< data1Hold*(2/3)){
+			data1 = data1Hold;
+		}
+		
+		if(data2Hold == 0){
+			data2 = data2;
+		}else if(data2 > data2Hold*1.5 || data2< data2Hold*(2/3)){
+			data2 = data2Hold;
+		}
+		
+		if(data3Hold == 0){
+			data3 = data3;
+		}else if(data3 > data3Hold*1.5 || data3< data3Hold*(2/3)){
+			data3 = data3Hold;
+		}
+		int boxSize = 510;
+		slope1 = (data1 - data2) / (0-100);
+		slope2 = (data2 - data3) / (100-200);
+		for(int x = 0; x < boxSize; x++){
+			//Front left
+			rectangle1.left = x + 500;
+			rectangle1.top = 300;
+			rectangle1.right = rectangle1.left + 1;
+			rectangle1.bottom = rectangle1.top - boxSize;
+			if(x <= boxSize/2){
+				RGB = (510/55)*(data1 +(slope1 * x));
+			}else if(x > boxSize/2){
+				RGB = (510/55)*(data2 +(slope2 *(x-(boxSize/2))));
+			}
+			//cout<<" "<<RGB;
+			if(RGB <= 255){
+				blue = (-RGB) + 255;
+				red = 0;
+				green = (RGB);
+			}else if(RGB >= 255){
+				blue = 0;
+				green = (-RGB) + 510;
+				red = (RGB) - 255;
+			}
+			myBrush = CreateSolidBrush(RGB(red, green, blue));
+			FillRect(mydc, &rectangle1, myBrush);
+			DeleteObject(myBrush);
+			
+			
+		}
+		Sleep(100);
 	}
 	
 }
@@ -244,7 +309,7 @@ void simulation(Car* car, RECT* fl, RECT* fr, RECT* rl, RECT* rr){
 		
 	
 		}
-		Sleep(200);
+		Sleep(20);
 	
 	
 	}
