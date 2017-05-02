@@ -216,7 +216,7 @@ void simulation(Car* car, RECT* fl, RECT* fr, RECT* rl, RECT* rr){
 			fl->left = x + 500;
 			fl->top = 300;
 			fl->right = fl->left + 1;
-			fl->bottom = fl->top - boxSize;
+			fl->bottom = fl->top + boxSize;
 			
 			if(x <= boxSize/2){
 				RGB = (510/110)*(car->getTemperature(frontLeft, outer, i) +(flSlope1 * x));
