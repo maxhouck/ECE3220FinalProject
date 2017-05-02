@@ -6,7 +6,6 @@
  */
 #include<windows.h>
 #include "tires.h"
-#include<graphics.h>
 #include "SerialClass.h"
 
 void programStart(void);
