@@ -15,7 +15,7 @@ class BaseGraphics{
 		virtual ~BaseGraphics(){};
 		
 		//How do we move?
-		void move(int dx, int dy);
+		virtual void move(int dx, int dy);
 	
 };
 
@@ -25,7 +25,10 @@ class CarGraphics : public BaseGraphics{
 		//What shapes are we using?
 		RECT frontLeft, frontRight, rearLeft, rearRight;
 		//How big are they?
-		int rectSize;
+		int flRectSize;
+		int frRectSize;
+		int rlRectSize;
+		int rrRectSize;
 		//Where will they be with respect to the center point?
 		int xCord_offsetStart;
 		int yCord_offsetStart;
@@ -51,18 +54,57 @@ class CarGraphics : public BaseGraphics{
 		void setDataRearRight(double outer, double middle, double inner);
 		
 		//How do we calculate the gradients?
-		vector<double> calculateGradient(double point1, double point2, double point3);
+		vector<double> calculateGradient(double point1, double point2, double point3, int rectSize);
 		
 		//How do we change the shape characteristics?
 		void updateRectangles(void);
 		void updateGradients(void);
 		void resize(int newSize);
+		void flResize(int newSize);
+		void frResize(int newSize);
+		void rlResize(int newSize);
+		void rrResize(int newSize);
+		void updateOffset(int nx, int ny);
 		void horizontalShift(int dx);
 		void verticalShift(int dy);
 		void setRange(int low, int high);
+		void move(int nx, int ny);
 		
 		//How do we draw the graphics to the screen?
 		void drawGraphics(HDC* mydc); 
+	
+};
+
+class RealTimeGraphics : public BaseGraphics{
+	private:
+		//What is the shape?
+		RECT rectangle;
+		//How big is it?
+		int length;
+		int width;
+		
+		double outsideDataPoint, middleDataPoint, insideDataPoint;
+		vector<double> gradient;
+		
+		int tempLow, tempHigh;
+	public:
+		RealTimeGraphics();
+		~RealTimeGraphics(){};
+		
+		void setData(double value1, double value2, double value3);
+		
+		vector<double> calculateGradient(double point1, double point2, double point3, int size);
+		
+		void updateRectangle(void);
+		void updateGradient(void);
+		void resize(int nLength, int nWidth);
+		
+		void horizontalShift(int dx);
+		void verticalShift(int dy);
+		void setRange(int low, int high);
+		void move(int nx, int ny);
+		
+		void draw(HDC* mydc);
 	
 };
 
