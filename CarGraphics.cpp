@@ -389,3 +389,138 @@ void CarGraphics::drawGraphics(HDC* mydc){
 		
 	}
 }
+
+/*****************************************************************************
+							Real Time Graphics
+*****************************************************************************/
+RealTimeGraphics::RealTimeGraphics() : BaseGraphics(){
+	this->length = 300;
+	this->width = 100;
+	
+	this->outsideDataPoint = 0;
+	this->middleDataPoint = 0;
+	this->insideDataPoint = 0;
+	
+	this->tempLow = 0;
+	this->tempHigh = 110;
+	
+	updateRectangle();
+	updateGradient();
+	
+}
+
+void RealTimeGraphics::setData(double value1, double value2, double value3){
+	this->outsideDataPoint = value1;
+	this->middleDataPoint = value2;
+	this->insideDataPoint = value3;
+	updateGradient();
+	updateRectangle();
+}
+
+vector<double> RealTimeGraphics::calculateGradient(double point1, double point2, double point3, int size){
+	double slope1, slope2, slope3, slope4;
+	double quaterRect = size / 4;
+	double halfRect = size / 2;
+	double threeQuaterRect = size *((double)(3) / (double)(4));
+	vector<double> slopes;
+	slope1 = (0 - point1) / (0 - quaterRect);
+	slope2 = (point1 - point2) / (quaterRect - halfRect);
+	slope3 = (point2 - point3) / (halfRect - threeQuaterRect);
+	slope4 = (point3 - 0) / (threeQuaterRect - size);
+	
+	slopes.push_back(slope1);
+	slopes.push_back(slope2);
+	slopes.push_back(slope3);
+	slopes.push_back(slope4);
+	return(slopes);
+}
+
+void RealTimeGraphics::updateRectangle(void){
+	this->rectangle.left = this->x;
+	this->rectangle.right = this->rectangle.left + 1;
+	this->rectangle.top = this->y;
+	this->rectangle.bottom = this->rectangle.top + this->width;
+}
+
+void RealTimeGraphics::updateGradient(void){
+	this->gradient = this->calculateGradient(this->outsideDataPoint,
+												this->middleDataPoint,
+												this->insideDataPoint,
+												this->length);
+}
+
+void RealTimeGraphics::resize(int nLength, int nWidth){
+	this->length = nLength;
+	this->width = nWidth;
+	updateGradient();
+	updateRectangle();
+}
+
+void RealTimeGraphics::horizontalShift(int dx){
+	this->x = this->x + dx;
+	updateRectangle();
+}
+
+void RealTimeGraphics::verticalShift(int dy){
+	this->y = this->y + dy;
+	updateRectangle();
+}
+
+void RealTimeGraphics::setRange(int low, int high){
+	this->tempLow = low;
+	this->tempHigh = high;
+	updateGradient();
+}
+
+void RealTimeGraphics::move(int nx, int ny){
+	this->x = nx;
+	this->y = ny;
+	updateRectangle();
+	updateGradient();
+}
+
+void RealTimeGraphics::draw(HDC* mydc){
+	double quaterRect = this->length / 4;
+	double halfRect = this->length / 2;
+	double threeQuaterRect = this->length *((double)(3) / (double)(4));
+	int red, blue, green;
+	int RGB;
+	RECT tempRect = this->rectangle;
+	HBRUSH myBrush;
+	int tempRange = this->tempHigh - this->tempLow;
+	
+	for(double i = 0; i < this->length; i++){
+		//Front Right
+		tempRect.left = i + this->rectangle.left;
+		tempRect.top = this->rectangle.top;
+		tempRect.right = tempRect.left + 1;
+		tempRect.bottom = this->rectangle.bottom;
+	
+		if(i <= quaterRect){
+			RGB = (510/tempRange)*(0 +(this->gradient[0] * i));
+		}
+		else if(i > quaterRect && i <= halfRect){
+			RGB = (510/tempRange)*(this->outsideDataPoint + (this->gradient[1] *(i - quaterRect)));
+		}
+		else if(i > halfRect && i <= threeQuaterRect){
+			RGB = (510/tempRange)*(this->middleDataPoint + (this->gradient[2] *(i - halfRect)));
+		}
+		else if(i > threeQuaterRect){
+			RGB = (510/tempRange)*(this->insideDataPoint + (this->gradient[3] *(i - threeQuaterRect)));
+		}
+		
+	    //cout<<"\n "<<i<<" "<<RGB;
+		if(RGB <= 255){
+			blue = (-RGB) + 255;
+			red = 0;
+			green = (RGB);
+		}else if(RGB >= 255){
+			blue = 0;
+			green = (-RGB) + 510;
+			red = (RGB) - 255;
+		}
+		myBrush = CreateSolidBrush(RGB(red, green, blue));
+		FillRect(*mydc, &tempRect, myBrush);
+		DeleteObject(myBrush);
+	}
+}

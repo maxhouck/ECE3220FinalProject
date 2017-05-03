@@ -1,9 +1,4 @@
-/*
- * main.cpp
- *
- *  Created on: Apr 21, 2017
- *      Author: MizzouRacing
- */
+
 #include<windows.h>
 #include "tires.h"
 #include "SerialClass.h"
@@ -16,9 +11,10 @@ void dataVisualizationWelcomeMessage(void);
 void simulation(Car* car, CarGraphics*);
 void realTimeDemo(void);
 Car* carSetup(void);
-CarGraphics* graphicsSetup(void);
+void graphicsSetup(CarGraphics*);
 void graphicsSetupOptionMenu(void);
-
+void realTimeGraphicsSetup(RealTimeGraphics*);
+void realTimeGraphicsSetupOptionMenu(void);
 
 
 int main() {
@@ -65,13 +61,12 @@ void mainOptionMenu(void){
 }
 
 void realTimeDemo(void){
-	Serial* SP = new Serial("COM4");
 	HWND myconsole = GetConsoleWindow();
 	HDC mydc = GetDC(myconsole);
-	HBRUSH myBrush;
-	int red, blue, green;
-	int RGB;
-	/*
+	RealTimeGraphics* realTime = new RealTimeGraphics();
+	realTimeGraphicsSetup(realTime);
+	Serial* SP;
+	
 	while(1){
 		try{
 			SP = new Serial("COM4"); //We may need to adjust this as necessary
@@ -88,7 +83,7 @@ void realTimeDemo(void){
 		catch(...){
 			cout<<"\n Catch all realTimeDemo. Should not be here!"<<endl;
 		}
-	}*/
+	}
 	
 	if (SP->IsConnected()){
 		cout<<"\n Ardiuno Connected!"<<endl;
@@ -104,10 +99,7 @@ void realTimeDemo(void){
 	int data2 = 0;
 	int data3 = 0;
 	int data1Hold, data2Hold, data3Hold;
-	int slope1, slope2;
-	RECT rectangle1;
-	while(1)
-	{
+	while(1){
 		data1Hold = data1;
 		data2Hold = data2;
 		data3Hold = data3;
@@ -136,74 +128,122 @@ void realTimeDemo(void){
 		}else if(data3 > data3Hold*1.5 || data3< data3Hold*(2/3)){
 			data3 = data3Hold;
 		}
-		int boxSize = 510;
-		slope1 = (data1 - data2) / (0-100);
-		slope2 = (data2 - data3) / (100-200);
-		for(int x = 0; x < boxSize; x++){
-			//Front left
-			rectangle1.left = x + 500;
-			rectangle1.top = 300;
-			rectangle1.right = rectangle1.left + 1;
-			rectangle1.bottom = rectangle1.top - boxSize;
-			if(x <= boxSize/2){
-				RGB = (510/55)*(data1 +(slope1 * x));
-			}else if(x > boxSize/2){
-				RGB = (510/55)*(data2 +(slope2 *(x-(boxSize/2))));
-			}
-			//cout<<" "<<RGB;
-			if(RGB <= 255){
-				blue = (-RGB) + 255;
-				red = 0;
-				green = (RGB);
-			}else if(RGB >= 255){
-				blue = 0;
-				green = (-RGB) + 510;
-				red = (RGB) - 255;
-			}
-			myBrush = CreateSolidBrush(RGB(red, green, blue));
-			FillRect(mydc, &rectangle1, myBrush);
-			DeleteObject(myBrush);
-			
-			
-		}
+		realTime->setData(data1, data2, data3);
+		realTime->draw(&mydc);
 		Sleep(100);
-	}
-	
+		}
+	delete realTime;
 }
+	
+	
 
-void dataVisualization(void){
-	string userInput;
-	
-	Car* car = carSetup();
-	
-	CarGraphics* graphicsCar = graphicsSetup();
-	cout<<"\n\n\n\n Car creation and GUI setup complete.\nPress any key to continue"<<endl;
-	
-	getline(cin, userInput);
-	
-	simulation(car, graphicsCar);
-	
-	delete car;
-	
-}
-
-CarGraphics* graphicsSetup(void){
+void realTimeGraphicsSetup(RealTimeGraphics* graphics){
 	string userInput;
 	HWND myconsole = GetConsoleWindow();
 	HDC mydc = GetDC(myconsole);
 	int value;
-	CarGraphics* car = new CarGraphics();
+	while(1){
+		
+		realTimeGraphicsSetupOptionMenu();
+		getline(cin,userInput);
+		if(userInput == "1"){
+			graphics->draw(&mydc);
+			graphics->draw(&mydc);
+		}else if(userInput == "2"){
+			int value2;
+			cout<<"\n Please enter the new X value: "<<endl;
+			cin>>value;
+			cout<<"\n Please enter the new Y value: "<<endl;
+			cin>>value2;
+			graphics->move(value, value2);
+		}else if(userInput == "3"){
+			cout<<"\n Please enter the value you wish to vertically shift the graph by:"<<endl;
+			cin>>value;
+			graphics->verticalShift(value);
+		}else if(userInput == "4"){
+			cout<<"\n Please enter the value you wish to horizontally shift the graph by:"<<endl;
+			cin>>value;
+			graphics->horizontalShift(value);
+		}else if(userInput == "5"){
+			int value2;
+			cout<<"\n Please enter the new length:"<<endl;
+			cin>>value;
+			cout<<"\n Please enter the new width:"<<endl;
+			cin>>value2;
+			graphics->resize(value, value2);
+		}else if(userInput == "6"){
+			int value2;
+			cout<<"\n Please enter the lowest temperature:"<<endl;
+			cin>>value;
+			cout<<"\n Please enter the highest temperature:"<<endl;
+			cin>>value2;
+			graphics->setRange(value, value2);
+		}else if(userInput == "7"){
+			break;
+		}else{
+			cout<<"\n Invalid Input!"<<endl;
+		}
+	}
+	return;
+}
+
+void realTimeGraphicsSetupOptionMenu(void){
+	cout<<"\n Graphics Setup Options:"
+		<<"\n 1)Print"
+		<<"\n 2)Move"
+		<<"\n 3)Vertical Shift"
+		<<"\n 4)Horizontal Shift"
+		<<"\n 5)Resize graph"
+		<<"\n 6)Set temperature range"
+		<<"\n 7)Finish"<<endl;
+}
+
+void dataVisualization(void){
+	string userInput;
+	CarGraphics* graphicsCar = new CarGraphics();
+	graphicsSetup(graphicsCar);
+	Car* car = carSetup();
+			
+	cout<<"\n\n\n\n Car creation and GUI setup complete.\nPress any key to continue"<<endl;
+	getline(cin, userInput);
+	simulation(car, graphicsCar);
+	while(1){
+
+		
+		cout<<"\n Simulation complete!"
+			<<"\n What would you like to do?"
+			<<"\n 1)Run the simulation"
+			<<"\n 2)Change car data"
+			<<"\n 3)Change graphics settings"
+			<<"\n 4)Quit to main menu"<<endl;
+		getline(cin,userInput);
+		
+		if(userInput == "1"){
+			simulation(car, graphicsCar);
+		}else if(userInput == "2"){
+			delete car;
+			car = carSetup();
+		}else if(userInput == "3"){
+			graphicsSetup(graphicsCar);
+		}else if(userInput == "4"){
+			break;
+		}
+	}
+	delete car;
+	delete graphicsCar;
+	
+}
+
+void graphicsSetup(CarGraphics* car){
+	string userInput;
+	HWND myconsole = GetConsoleWindow();
+	HDC mydc = GetDC(myconsole);
+	int value;
 	while(1){
 		
 		graphicsSetupOptionMenu();
 		getline(cin,userInput);
 		if(userInput == "1"){
-			car->drawGraphics(&mydc);
-			car->drawGraphics(&mydc);
-			car->drawGraphics(&mydc);
-			car->drawGraphics(&mydc);
-			car->drawGraphics(&mydc);
-			car->drawGraphics(&mydc);
 			car->drawGraphics(&mydc);
 			car->drawGraphics(&mydc);
 			getline(cin, userInput);
@@ -259,7 +299,7 @@ CarGraphics* graphicsSetup(void){
 			cout<<"\nInvalid Input!"<<endl;
 		}
 	}
-	return car;
+	return;
 }
 
 void graphicsSetupOptionMenu(void){
@@ -275,7 +315,7 @@ void graphicsSetupOptionMenu(void){
 		<<"\n 9)Resize Rear Right Tire"
 		<<"\n 10)Increase Offset From MidPoint"
 		<<"\n 11)Set temperature range"
-		<<"\n 12)Exit to simulation"<<endl;
+		<<"\n 12)Finish"<<endl;
 }
 
 
@@ -324,7 +364,7 @@ Car* carSetup(void){
 	dataVisualizationWelcomeMessage();
 	ifstream dataFile1, dataFile2, dataFile3, dataFile4;
 	
-	cout<<"\n Please enter the name the car : "<<endl;
+	cout<<"\n Please enter the name of the car : "<<endl;
 	getline(cin, userInput);
 	
 	Car* car = new Car(userInput);

@@ -75,4 +75,37 @@ class CarGraphics : public BaseGraphics{
 	
 };
 
+class RealTimeGraphics : public BaseGraphics{
+	private:
+		//What is the shape?
+		RECT rectangle;
+		//How big is it?
+		int length;
+		int width;
+		
+		double outsideDataPoint, middleDataPoint, insideDataPoint;
+		vector<double> gradient;
+		
+		int tempLow, tempHigh;
+	public:
+		RealTimeGraphics();
+		~RealTimeGraphics(){};
+		
+		void setData(double value1, double value2, double value3);
+		
+		vector<double> calculateGradient(double point1, double point2, double point3, int size);
+		
+		void updateRectangle(void);
+		void updateGradient(void);
+		void resize(int nLength, int nWidth);
+		
+		void horizontalShift(int dx);
+		void verticalShift(int dy);
+		void setRange(int low, int high);
+		void move(int nx, int ny);
+		
+		void draw(HDC* mydc);
+	
+};
+
 #endif
