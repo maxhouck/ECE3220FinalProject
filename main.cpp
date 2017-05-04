@@ -4,6 +4,9 @@
 #include "SerialClass.h"
 #include "CarGraphics.h"
 
+#define LOGGING_RATE .1
+#define ACCEPTABLE_PERCENTAGE .05
+
 void programStart(void);
 void mainOptionMenu(void);
 void dataVisualization(void);
@@ -103,6 +106,11 @@ void realTimeDemo(void){
 	int buf1[bufferSize], buf2[bufferSize], buf3[bufferSize];
 	int data1Hold, data2Hold, data3Hold;
 	int average1,average2,average3, i;
+	
+	int slope1, slope2, slope3;
+	int estimatedPoint1, estimatedPoint2, estimatedPoint3;
+	double percentDiff1, percentDiff2, percentDiff3;
+	double averageDelta;
 	while(1){
 
 		data1Hold = data1;
@@ -124,45 +132,73 @@ void realTimeDemo(void){
 				buf3[i] = data3;
 			}
 		}
-
 		int sum = 0; //calculate averages of buffers and error check
-		for(i=0;i<bufferSize;i++)
+		/*
+		for(int i=0;i<bufferSize;i++){
+			sum+=buf1[i];
+		}
+		average1 = sum / bufferSize;
+		sum = 0;
+		for(int i = 0; i < bufferSize; i++){
+			sum += buf1[i] - average1;
+		}
+		averageDelta = sum / buffersize;
+		percentDiff1 = (data1 - average1) / averageDelta;
+		if(percentDiff1 > ACCEPTABLE_PERCENTAGE && percentDiff1 < (ACCEPTABLE_PERCENTAGE + .01)
+			|| percentDiff1 < ACCEPTABLE_PERCENTAGE  && percentDiff1 > (ACCEPTABLE_PERCENTAGE - .01)){
+			data1 *= .9;
+		}
+		if(percentDiff1 > (ACCEPTABLE_PERCENTAGE + .01) && percentDiff1 < (ACCEPTABLE_PERCENTAGE + .05)
+			|| percentDiff1 < (ACCEPTABLE_PERCENTAGE - .01)  && percentDiff1 > (ACCEPTABLE_PERCENTAGE - .05)){
+			data1 *= .8;
+		}
+		if(percentDiff1 > (ACCEPTABLE_PERCENTAGE + .05) && percentDiff1 < (ACCEPTABLE_PERCENTAGE + .1)
+			|| percentDiff1 < (ACCEPTABLE_PERCENTAGE - .05)  && percentDiff1 > (ACCEPTABLE_PERCENTAGE - .1)){
+			data1 *= .6;
+		}
+		if(percentDiff1 > (ACCEPTABLE_PERCENTAGE + .1) && percentDiff1 < (ACCEPTABLE_PERCENTAGE + .2)
+			|| percentDiff1 < (ACCEPTABLE_PERCENTAGE - .1)  && percentDiff1 > (ACCEPTABLE_PERCENTAGE - .2)){
+			data1 *= .;
+		}
+		*/
+		sum = 0;
+		for(int i=0;i<bufferSize;i++)
 			sum+=buf1[i];
 		average1 = sum / bufferSize;
 		if (data1 > average1 + 10 | data1 < average1 - 10)
 			data1 = average1;
 		sum = 0;
-		for(i=0;i<bufferSize;i++)
+		for(int i=0;i<bufferSize;i++)
 			sum+=buf2[i];
 		average2 = sum / bufferSize;
 		if (data2 > average2 + 10 | data2 < average2 - 10)
 			data2 = average2;
 		sum = 0;
-		for(i=0;i<bufferSize;i++)
+		for(int i=0;i<bufferSize;i++)
 			sum+=buf3[i];
 		average3 = sum / bufferSize;
 		if (data3 > average3 + 10 | data3 < average3 - 10)
 			data3 = average3;
 
-
+		
 		 //rotate it in the new values to each buffer
 		bufferHold1 = buf1[0];
 		buf1[0] = data1;
-		for(i=1;i<bufferSize;i++) {
+		for(int i=1;i<bufferSize;i++) {
 			bufferHold2 = buf1[i];
 			buf1[i] = bufferHold1;
 			bufferHold1 = bufferHold2;
 		}
 		bufferHold1 = buf2[0];
 		buf2[0] = data2;
-		for(i=1;i<bufferSize;i++) {
+		for(int i=1;i<bufferSize;i++) {
 			bufferHold2 = buf2[i];
 			buf2[i] = bufferHold1;
 			bufferHold1 = bufferHold2;
 		}
 		bufferHold1 = buf3[0];
 		buf3[0] = data3;
-		for(i=1;i<bufferSize;i++) {
+		for(int i =1;i<bufferSize;i++) {
 			bufferHold2 = buf3[i];
 			buf3[i] = bufferHold1;
 			bufferHold1 = bufferHold2;
@@ -170,7 +206,7 @@ void realTimeDemo(void){
 
 		realTime->setData(data1, data2, data3); //output to graphics
 		realTime->draw(&mydc);
-		Sleep(100);
+		Sleep(150);
 		}
 	delete realTime;
 }
