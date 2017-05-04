@@ -71,30 +71,102 @@ CarGraphics::CarGraphics(int x, int y, int size, int xOffset, int yOffset) : Bas
 	this->tempHigh = 110;
 }
 
-void CarGraphics::setDataFrontLeft(double outer, double middle, double inner){
-	this->flDataPointOutside = outer - this->tempLow;
-	this->flDataPointMiddle = middle - this->tempLow;
-	this->flDataPointInside = inner - this->tempLow;
+void CarGraphics::setDataFrontLeft(double value1, double value2, double value3){
+	if(value1 > this->tempHigh){
+		value1 = this->tempHigh;
+	}
+	if(value2 > this->tempHigh){
+		value2 = this->tempHigh;
+	}
+	if(value3 > this->tempHigh){
+		value3 = this->tempHigh;
+	}
+	if(value1 < this->tempLow){
+		value1 = this->tempLow;
+	}
+	if(value2 < this->tempLow){
+		value2 = this->tempLow;
+	}
+	if(value3 < this->tempLow){
+		value3 = this->tempLow;
+	}
+	this->flDataPointOutside = value1 - this->tempLow;
+	this->flDataPointMiddle = value2 - this->tempLow;
+	this->flDataPointInside = value3 - this->tempLow;
 	this->updateGradients();
 }
 
-void CarGraphics::setDataFrontRight(double outer, double middle, double inner){
-	this->frDataPointOutside = outer - this->tempLow;
-	this->frDataPointMiddle = middle - this->tempLow;
-	this->frDataPointInside = inner - this->tempLow;
+void CarGraphics::setDataFrontRight(double value1, double value2, double value3){
+	if(value1 > this->tempHigh){
+		value1 = this->tempHigh;
+	}
+	if(value2 > this->tempHigh){
+		value2 = this->tempHigh;
+	}
+	if(value3 > this->tempHigh){
+		value3 = this->tempHigh;
+	}
+	if(value1 < this->tempLow){
+		value1 = this->tempLow;
+	}
+	if(value2 < this->tempLow){
+		value2 = this->tempLow;
+	}
+	if(value3 < this->tempLow){
+		value3 = this->tempLow;
+	}
+	this->frDataPointOutside = value1 - this->tempLow;
+	this->frDataPointMiddle = value2 - this->tempLow;
+	this->frDataPointInside = value3 - this->tempLow;
 	this->updateGradients();
 }
 
-void CarGraphics::setDataRearLeft(double outer, double middle, double inner){
-	this->rlDataPointOutside = outer - this->tempLow;
-	this->rlDataPointMiddle = middle - this->tempLow;
-	this->rlDataPointInside = inner - this->tempLow;
+void CarGraphics::setDataRearLeft(double value1, double value2, double value3){
+	if(value1 > this->tempHigh){
+		value1 = this->tempHigh;
+	}
+	if(value2 > this->tempHigh){
+		value2 = this->tempHigh;
+	}
+	if(value3 > this->tempHigh){
+		value3 = this->tempHigh;
+	}
+	if(value1 < this->tempLow){
+		value1 = this->tempLow;
+	}
+	if(value2 < this->tempLow){
+		value2 = this->tempLow;
+	}
+	if(value3 < this->tempLow){
+		value3 = this->tempLow;
+	}
+	this->rlDataPointOutside = value1 - this->tempLow;
+	this->rlDataPointMiddle = value2 - this->tempLow;
+	this->rlDataPointInside = value3 - this->tempLow;
 	this->updateGradients();
 }
-void CarGraphics::setDataRearRight(double outer, double middle, double inner){
-	this->rrDataPointOutside = outer - this->tempLow;
-	this->rrDataPointMiddle = middle - this->tempLow;
-	this->rrDataPointInside = inner - this->tempLow;
+void CarGraphics::setDataRearRight(double value1, double value2, double value3){
+	if(value1 > this->tempHigh){
+		value1 = this->tempHigh;
+	}
+	if(value2 > this->tempHigh){
+		value2 = this->tempHigh;
+	}
+	if(value3 > this->tempHigh){
+		value3 = this->tempHigh;
+	}
+	if(value1 < this->tempLow){
+		value1 = this->tempLow;
+	}
+	if(value2 < this->tempLow){
+		value2 = this->tempLow;
+	}
+	if(value3 < this->tempLow){
+		value3 = this->tempLow;
+	}
+	this->rrDataPointOutside = value1 - this->tempLow;
+	this->rrDataPointMiddle = value2 - this->tempLow;
+	this->rrDataPointInside = value3 - this->tempLow;
 	this->updateGradients();
 }
 
@@ -410,9 +482,27 @@ RealTimeGraphics::RealTimeGraphics() : BaseGraphics(){
 }
 
 void RealTimeGraphics::setData(double value1, double value2, double value3){
-	this->outsideDataPoint = value1;
-	this->middleDataPoint = value2;
-	this->insideDataPoint = value3;
+	if(value1 > this->tempHigh){
+		value1 = this->tempHigh;
+	}
+	if(value2 > this->tempHigh){
+		value2 = this->tempHigh;
+	}
+	if(value3 > this->tempHigh){
+		value3 = this->tempHigh;
+	}
+	if(value1 < this->tempLow){
+		value1 = this->tempLow;
+	}
+	if(value2 < this->tempLow){
+		value2 = this->tempLow;
+	}
+	if(value3 < this->tempLow){
+		value3 = this->tempLow;
+	}
+	this->outsideDataPoint = value1 - this->tempLow;
+	this->middleDataPoint = value2 - this->tempLow;
+	this->insideDataPoint = value3 - this->tempLow;
 	updateGradient();
 	updateRectangle();
 }
