@@ -98,37 +98,77 @@ void realTimeDemo(void){
 	int data1 = 0;
 	int data2 = 0;
 	int data3 = 0;
+	int bufferSize = 5;
+	int bufferHold1,bufferHold2;
+	int buf1[bufferSize], buf2[bufferSize], buf3[bufferSize];
 	int data1Hold, data2Hold, data3Hold;
+	int average1,average2,average3, i;
 	while(1){
+
 		data1Hold = data1;
 		data2Hold = data2;
 		data3Hold = data3;
 		readResult = SP->ReadData(incomingData,dataLength);
 		
-		token = strtok(incomingData,",");
+		token = strtok(incomingData,","); //parsing serial output from arduino
 		data1 = atoi(token);
 		token = strtok(NULL, ",");
 		data2 = atoi(token);
 		token = strtok(NULL, ",");
 		data3 = atoi(token);
-		if(data1Hold == 0){
-			data1 = data1;
-		}else if(data1 > data1Hold*1.5 || data1< data1Hold*(2/3)){
-			data1 = data1Hold;
+
+		if(buf1[0] == 0) { //if buffers are empty
+			for(i=0;i<bufferSize;i++) {
+				buf1[i] = data1; //fill them completely with first value
+				buf2[i] = data2;
+				buf3[i] = data3;
+			}
 		}
-		
-		if(data2Hold == 0){
-			data2 = data2;
-		}else if(data2 > data2Hold*1.5 || data2< data2Hold*(2/3)){
-			data2 = data2Hold;
+
+		int sum = 0; //calculate averages of buffers and error check
+		for(i=0;i<bufferSize;i++)
+			sum+=buf1[i];
+		average1 = sum / bufferSize;
+		if (data1 > average1 + 10 | data1 < average1 - 10)
+			data1 = average1;
+		sum = 0;
+		for(i=0;i<bufferSize;i++)
+			sum+=buf2[i];
+		average2 = sum / bufferSize;
+		if (data2 > average2 + 10 | data2 < average2 - 10)
+			data2 = average2;
+		sum = 0;
+		for(i=0;i<bufferSize;i++)
+			sum+=buf3[i];
+		average3 = sum / bufferSize;
+		if (data3 > average3 + 10 | data3 < average3 - 10)
+			data3 = average3;
+
+
+		 //rotate it in the new values to each buffer
+		bufferHold1 = buf1[0];
+		buf1[0] = data1;
+		for(i=1;i<bufferSize;i++) {
+			bufferHold2 = buf1[i];
+			buf1[i] = bufferHold1;
+			bufferHold1 = bufferHold2;
 		}
-		
-		if(data3Hold == 0){
-			data3 = data3;
-		}else if(data3 > data3Hold*1.5 || data3< data3Hold*(2/3)){
-			data3 = data3Hold;
+		bufferHold1 = buf2[0];
+		buf2[0] = data2;
+		for(i=1;i<bufferSize;i++) {
+			bufferHold2 = buf2[i];
+			buf2[i] = bufferHold1;
+			bufferHold1 = bufferHold2;
 		}
-		realTime->setData(data1, data2, data3);
+		bufferHold1 = buf3[0];
+		buf3[0] = data3;
+		for(i=1;i<bufferSize;i++) {
+			bufferHold2 = buf3[i];
+			buf3[i] = bufferHold1;
+			bufferHold1 = bufferHold2;
+		}
+
+		realTime->setData(data1, data2, data3); //output to graphics
 		realTime->draw(&mydc);
 		Sleep(100);
 		}
